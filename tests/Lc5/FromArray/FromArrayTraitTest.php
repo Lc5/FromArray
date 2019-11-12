@@ -1,0 +1,138 @@
+<?php
+declare(strict_types=1);
+
+namespace Lc5\FromArray;
+
+use ArrayObject;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
+use stdClass;
+
+class FromArrayTraitTest extends TestCase
+{
+    public function testFromArray_GivenCorrectProperties_ShouldCreateObject()
+    {
+        $properties = [
+            'bool' => true,
+            'int' => 2,
+            'float' => 3.5,
+            'string' => 'example string',
+            'array' => ['example array'],
+            'object' => new stdClass(),
+            'callable' => function () {
+            },
+            'iterable' => new ArrayObject(),
+        ];
+
+        $instance = TestClass::fromArray($properties);
+
+        $this->assertInstanceOf(TestClass::class, $instance);
+    }
+
+    public function testFromArray_GivenCorrectPropertiesForMultiTypeProperty_ShouldCreateObject()
+    {
+        $this->assertInstanceOf(TestClass2::class, TestClass2::fromArray([
+            'stringOrNull' => 'string'
+        ]));
+
+        $this->assertInstanceOf(TestClass2::class, TestClass2::fromArray([
+            'stringOrNull' => null
+        ]));
+    }
+
+    public function testFromArray_GivenMissingProperties_ShouldThrowException()
+    {
+        $properties = [
+            'bool' => true,
+            'int' => 2,
+            'float' => 3.5,
+            'string' => 'example string',
+        ];
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Missing properties: array, object, callable, iterable');
+
+        TestClass::fromArray($properties);
+    }
+
+    public function testFromArray_GivenRedundantProperties_ShouldThrowException()
+    {
+        $properties = [
+            'bool' => true,
+            'int' => 2,
+            'float' => 3.5,
+            'string' => 'example string',
+            'array' => ['example array'],
+            'object' => new stdClass(),
+            'callable' => function () {},
+            'iterable' => new ArrayObject(),
+            'redundant_1' => 'redundant',
+            'redundant_2' => 'redundant',
+        ];
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Redundant properties: redundant_1, redundant_2');
+
+        TestClass::fromArray($properties);
+    }
+
+    public function testFromArray_GivenInvalidProperties_ShouldThrowException()
+    {
+        $properties = [
+            'bool' => 1,
+            'int' => '2',
+            'float' => '3.5',
+            'string' => 'example string',
+            'array' => ['example array'],
+            'object' => [],
+            'callable' => function () {},
+            'iterable' => new ArrayObject(),
+        ];
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid properties:');
+        $this->expectExceptionMessage('bool must be of the type bool, integer given');
+        $this->expectExceptionMessage('int must be of the type int, string given');
+        $this->expectExceptionMessage('float must be of the type float, string given');
+        $this->expectExceptionMessage('object must be of the type object, array given');
+
+        TestClass::fromArray($properties);
+    }
+}
+
+class TestClass
+{
+    /** @var bool */
+    private $bool;
+
+    /** @var int */
+    private $int;
+
+    /** @var float */
+    private $float;
+
+    /** @var string */
+    private $string;
+
+    /** @var array */
+    private $array;
+
+    /** @var object */
+    private $object;
+
+    /** @var callable */
+    private $callable;
+
+    /** @var iterable */
+    private $iterable;
+
+    use FromArrayTrait;
+}
+
+class TestClass2
+{
+    /** @var string|null */
+    private $stringOrNull;
+
+    use FromArrayTrait;
+}

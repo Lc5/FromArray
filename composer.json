@@ -1,0 +1,24 @@
+{
+    "name": "lc5/from-array",
+    "description": "Create objects from arrays with type checks",
+    "keywords": ["array", "arrays", "object", "objects", "trait", "traits"],
+    "homepage": "https://github.com/Lc5/FromArray",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Łukasz Krzyszczak",
+            "email": "lukasz.krzyszczak@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Lc5\\FromArray\\": "src/Lc5/FromArray"
+        }
+    }
+}
