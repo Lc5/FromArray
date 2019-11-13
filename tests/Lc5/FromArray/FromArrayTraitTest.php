@@ -42,6 +42,55 @@ class FromArrayTraitTest extends TestCase
         ]));
     }
 
+    public function testFromArray_GivenCorrectPropertiesWithoutRedundantCheck_ShouldCreateObject()
+    {
+        $properties = [
+            'bool'       => true,
+            'int'        => 2,
+            'float'      => 3.5,
+            'string'     => 'example string',
+            'array'      => ['example array'],
+            'typedArray' => [new stdClass(), new stdClass()],
+            'object'     => new stdClass(),
+            'callable'   => function () {},
+            'iterable'   => new ArrayObject(),
+            'redundant_1' => 'redundant',
+            'redundant_2' => 'redundant'
+        ];
+
+        $instance = TestClass::fromArray($properties, Options::DEFAULT & ~Options::VALIDATE_REDUNDANT);
+
+        $this->assertInstanceOf(TestClass::class, $instance);
+    }
+
+    public function testFromArray_GivenCorrectPropertiesWithoutMissingCheck_ShouldCreateObject()
+    {
+        $properties = [];
+
+        $instance = TestClass2::fromArray($properties, Options::DEFAULT & ~Options::VALIDATE_MISSING);
+
+        $this->assertInstanceOf(TestClass2::class, $instance);
+    }
+
+    public function testFromArray_GivenInvalidTypesWithoutTypeCheck_ShouldCreateObject()
+    {
+        $properties = [
+            'bool'           => 1,
+            'int'            => '2',
+            'float'          => '3.5',
+            'string'         => 'example string',
+            'array'          => ['example array'],
+            'typedArray'     => [new stdClass(), 'example', 1],
+            'object'         => [],
+            'callable'       => function () {},
+            'iterable'       => new ArrayObject()
+        ];
+
+        $instance = TestClass::fromArray($properties, Options::DEFAULT & ~Options::VALIDATE_TYPES);
+
+        $this->assertInstanceOf(TestClass::class, $instance);
+    }
+
     public function testFromArray_GivenMissingProperties_ShouldThrowException()
     {
         $properties = [
@@ -70,7 +119,7 @@ class FromArrayTraitTest extends TestCase
             'callable'    => function () {},
             'iterable'    => new ArrayObject(),
             'redundant_1' => 'redundant',
-            'redundant_2' => 'redundant',
+            'redundant_2' => 'redundant'
         ];
 
         $this->expectException(InvalidArgumentException::class);

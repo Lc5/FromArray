@@ -107,7 +107,9 @@ trait FromArrayTrait
         $instance = new self();
 
         foreach ($classProperties as $propertyName) {
-            $instance->$propertyName = $properties[$propertyName];
+            if (array_key_exists($propertyName, $properties)) {
+                $instance->$propertyName = $properties[$propertyName];
+            }
         }
 
         return $instance;
