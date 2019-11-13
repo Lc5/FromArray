@@ -72,16 +72,15 @@ print_r(ExampleClass::fromArray($properties));
 
 The following options are available:
 
-- DEFAULT - check for missing and redundant properties and check types     
-- VALIDATE_MISSING - check for missing properties
-- VALIDATE_REDUNDANT - check for redundant properties
-- VALIDATE_TYPES - check types of properties
+- **DEFAULT** - check for missing and redundant properties and check types     
+- **VALIDATE_MISSING** - check for missing properties
+- **VALIDATE_REDUNDANT** - check for redundant properties
+- **VALIDATE_TYPES** - check types of properties
 
 Options can be combined using bitwise operators. To disable validation of redundant properties in order to be able to
 pass an array with more properties you can use the following code:
 
 ```php
-
 ExampleClass::fromArray($properties, Options::DEFAULT & ~Options::VALIDATE_REDUNDANT);
 
 ```
