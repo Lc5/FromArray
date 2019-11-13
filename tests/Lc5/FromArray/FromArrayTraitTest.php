@@ -156,6 +156,8 @@ class FromArrayTraitTest extends TestCase
 
 class TestClass
 {
+    use FromArrayTrait;
+
     /** @var bool */
     private $bool;
 
@@ -182,17 +184,15 @@ class TestClass
 
     /** @var iterable */
     private $iterable;
-
-    use FromArrayTrait;
 }
 
 class TestClass2
 {
+    use FromArrayTrait;
+
     /** @var string|null */
     private $stringOrNull;
 
     /** @var stdClass[]|null */
     private $typedArrayOrNull;
-
-    use FromArrayTrait;
 }
