@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Lc5\FromArray;
 
-use InvalidArgumentException;
+use Lc5\FromArray\Exception\InvalidArgumentException;
 use ReflectionClass;
 
 trait FromArrayTrait
@@ -27,15 +27,18 @@ trait FromArrayTrait
     protected static function validateExistence(array $properties, int $options): void
     {
         $classProperties = array_keys(get_class_vars(self::class));
+
         $missingProperties = $options & Options::VALIDATE_MISSING ?
             array_diff($classProperties, array_keys($properties)) : [];
+
         $redundantProperties = $options & Options::VALIDATE_REDUNDANT ?
             array_diff(array_keys($properties), $classProperties) : [];
 
         if (!empty($missingProperties) || !empty($redundantProperties)) {
-            $errorMessage = 'Errors encountered when constructing ' . self::class . "\n";
+            $errorMessage = 'Errors encountered when constructing ' . self::class . PHP_EOL;
+
             $errorMessage .= !empty($missingProperties) ?
-                'Missing properties: ' . rtrim(implode(', ', $missingProperties), ',') . "\n" : '';
+                'Missing properties: ' . rtrim(implode(', ', $missingProperties), ',') . PHP_EOL : '';
 
             $errorMessage .= !empty($redundantProperties) ?
                 'Redundant properties: ' . rtrim(implode(', ', $redundantProperties), ',') : '';
@@ -59,31 +62,38 @@ trait FromArrayTrait
                     $propertyValue = $properties[$propertyName];
 
                     foreach ($types as $type) {
-                        if ($type === 'callable' && is_callable($propertyValue) ||
-                            $type === 'iterable' && is_iterable($propertyValue) ||
-                            //@todo check if array contains only specified types
-                            substr($type, -2) === '[]' && is_array($propertyValue) ||
-                            gettype($propertyValue) === $type ||
-                            $propertyValue instanceof $type ) {
+                        if (substr($type, -2) === '[]' && is_array($propertyValue)) {
+                            $invalidTypes = self::validateTypedArray($propertyValue, substr($type, 0, -2));
+
+                            if (!empty($invalidTypes)) {
+                                $invalidProperties[] = [
+                                    'name'         => $propertyName,
+                                    'expectedType' => $matches[1],
+                                    'givenType'    => '[' . implode(', ', array_unique($invalidTypes)) . ']'
+                                ];
+                            }
+                            continue 2;
+                        } else if (self::validateType($type, $propertyValue)) {
                             continue 2;
                         }
                     }
 
                     $invalidProperties[] = [
-                        'name' => $propertyName,
+                        'name'         => $propertyName,
                         'expectedType' => $matches[1],
-                        'givenType' => gettype($propertyValue)
+                        'givenType'    => gettype($propertyValue)
                     ];
                 }
             }
         }
 
         if (!empty($invalidProperties)) {
-            $errorMessage = 'Errors encountered when constructing ' . self::class . "\n" . "Invalid properties: \n";
+            $errorMessage = 'Errors encountered when constructing ' . self::class . PHP_EOL .
+                            'Invalid properties: ' . PHP_EOL;
 
             foreach ($invalidProperties as $property) {
-                $errorMessage .= " - " . $property['name'] . " must be of the type " . $property['expectedType'] . ", "
-                    . $property['givenType'] . " given\n";
+                $errorMessage .= ' - ' . $property['name'] . ' must be of the type ' . $property['expectedType'] . ', '
+                    . $property['givenType'] . ' given' . PHP_EOL;
             }
 
             throw new InvalidArgumentException($errorMessage);
@@ -114,5 +124,27 @@ trait FromArrayTrait
         ];
 
         return $typesMap[$type] ?? $type;
+    }
+
+    private static function validateType(string $type, $value): bool
+    {
+        return
+            $type === 'callable' && is_callable($value) ||
+            $type === 'iterable' && is_iterable($value) ||
+            gettype($value) === $type ||
+            $value instanceof $type;
+    }
+
+    private static function validateTypedArray(array $typedArray, string $type): array
+    {
+        $invalidTypes = [];
+
+        foreach ($typedArray as $value) {
+            if (!self::validateType($type, $value)) {
+                $invalidTypes[] = gettype($value);
+            }
+        }
+
+        return $invalidTypes;
     }
 }
