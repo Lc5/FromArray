@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Lc5\FromArray;
@@ -67,21 +68,21 @@ trait FromArrayTrait
 
                             if (!empty($invalidTypes)) {
                                 $invalidProperties[] = [
-                                    'name'         => $propertyName,
+                                    'name' => $propertyName,
                                     'expectedType' => $matches[1],
-                                    'givenType'    => '[' . implode(', ', array_unique($invalidTypes)) . ']'
+                                    'givenType' => '[' . implode(', ', array_unique($invalidTypes)) . ']'
                                 ];
                             }
                             continue 2;
-                        } else if (self::validateType($type, $propertyValue)) {
+                        } elseif (self::validateType($type, $propertyValue)) {
                             continue 2;
                         }
                     }
 
                     $invalidProperties[] = [
-                        'name'         => $propertyName,
+                        'name' => $propertyName,
                         'expectedType' => $matches[1],
-                        'givenType'    => gettype($propertyValue)
+                        'givenType' => gettype($propertyValue)
                     ];
                 }
             }
@@ -118,11 +119,11 @@ trait FromArrayTrait
     private static function mapType(string $type): string
     {
         $typesMap = [
-            'bool'              => 'boolean',
-            'int'               => 'integer',
-            'float'             => 'double',
+            'bool' => 'boolean',
+            'int' => 'integer',
+            'float' => 'double',
             'resource (closed)' => 'resource',
-            'null'              => 'NULL'
+            'null' => 'NULL'
         ];
 
         return $typesMap[$type] ?? $type;
