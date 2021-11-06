@@ -9,9 +9,9 @@ use Lc5\FromArray\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
-class FromArrayTraitTest extends TestCase
+final class FromArrayTraitTest extends TestCase
 {
-    public function testFromArray_GivenCorrectProperties_ShouldCreateObject()
+    public function testFromArray_GivenCorrectProperties_ShouldCreateObject(): void
     {
         $properties = [
             'bool' => true,
@@ -21,7 +21,7 @@ class FromArrayTraitTest extends TestCase
             'array' => ['example array'],
             'typedArray' => [new stdClass(), new stdClass()],
             'object' => new stdClass(),
-            'callable' => function () {
+            'callable' => function (): void {
             },
             'iterable' => new ArrayObject()
         ];
@@ -31,7 +31,7 @@ class FromArrayTraitTest extends TestCase
         $this->assertInstanceOf(TestClass::class, $instance);
     }
 
-    public function testFromArray_GivenCorrectPropertiesForMultiTypeProperty_ShouldCreateObject()
+    public function testFromArray_GivenCorrectPropertiesForMultiTypeProperty_ShouldCreateObject(): void
     {
         $this->assertInstanceOf(TestClass2::class, TestClass2::fromArray([
             'stringOrNull' => 'string',
@@ -44,7 +44,7 @@ class FromArrayTraitTest extends TestCase
         ]));
     }
 
-    public function testFromArray_GivenCorrectPropertiesWithoutRedundantCheck_ShouldCreateObject()
+    public function testFromArray_GivenCorrectPropertiesWithoutRedundantCheck_ShouldCreateObject(): void
     {
         $properties = [
             'bool' => true,
@@ -54,7 +54,7 @@ class FromArrayTraitTest extends TestCase
             'array' => ['example array'],
             'typedArray' => [new stdClass(), new stdClass()],
             'object' => new stdClass(),
-            'callable' => function () {
+            'callable' => function (): void {
             },
             'iterable' => new ArrayObject(),
             'redundant_1' => 'redundant',
@@ -66,7 +66,7 @@ class FromArrayTraitTest extends TestCase
         $this->assertInstanceOf(TestClass::class, $instance);
     }
 
-    public function testFromArray_GivenCorrectPropertiesWithoutMissingCheck_ShouldCreateObject()
+    public function testFromArray_GivenCorrectPropertiesWithoutMissingCheck_ShouldCreateObject(): void
     {
         $properties = [];
 
@@ -75,7 +75,7 @@ class FromArrayTraitTest extends TestCase
         $this->assertInstanceOf(TestClass2::class, $instance);
     }
 
-    public function testFromArray_GivenInvalidTypesWithoutTypeCheck_ShouldCreateObject()
+    public function testFromArray_GivenInvalidTypesWithoutTypeCheck_ShouldCreateObject(): void
     {
         $properties = [
             'bool' => 1,
@@ -85,7 +85,7 @@ class FromArrayTraitTest extends TestCase
             'array' => ['example array'],
             'typedArray' => [new stdClass(), 'example', 1],
             'object' => [],
-            'callable' => function () {
+            'callable' => function (): void {
             },
             'iterable' => new ArrayObject()
         ];
@@ -95,7 +95,7 @@ class FromArrayTraitTest extends TestCase
         $this->assertInstanceOf(TestClass::class, $instance);
     }
 
-    public function testFromArray_GivenMissingProperties_ShouldThrowException()
+    public function testFromArray_GivenMissingProperties_ShouldThrowException(): void
     {
         $properties = [
             'bool' => true,
@@ -110,7 +110,7 @@ class FromArrayTraitTest extends TestCase
         TestClass::fromArray($properties);
     }
 
-    public function testFromArray_GivenRedundantProperties_ShouldThrowException()
+    public function testFromArray_GivenRedundantProperties_ShouldThrowException(): void
     {
         $properties = [
             'bool' => true,
@@ -120,7 +120,7 @@ class FromArrayTraitTest extends TestCase
             'array' => ['example array'],
             'typedArray' => [new stdClass(), new stdClass()],
             'object' => new stdClass(),
-            'callable' => function () {
+            'callable' => function (): void {
             },
             'iterable' => new ArrayObject(),
             'redundant_1' => 'redundant',
@@ -133,7 +133,7 @@ class FromArrayTraitTest extends TestCase
         TestClass::fromArray($properties);
     }
 
-    public function testFromArray_GivenInvalidProperties_ShouldThrowException()
+    public function testFromArray_GivenInvalidProperties_ShouldThrowException(): void
     {
         $properties = [
             'bool' => 1,
@@ -143,7 +143,7 @@ class FromArrayTraitTest extends TestCase
             'array' => ['example array'],
             'typedArray' => [new stdClass(), 'example', 1],
             'object' => [],
-            'callable' => function () {
+            'callable' => function (): void {
             },
             'iterable' => new ArrayObject(),
         ];
@@ -160,7 +160,7 @@ class FromArrayTraitTest extends TestCase
     }
 }
 
-class TestClass
+final class TestClass
 {
     use FromArrayTrait;
 
@@ -192,7 +192,7 @@ class TestClass
     private $iterable;
 }
 
-class TestClass2
+final class TestClass2
 {
     use FromArrayTrait;
 

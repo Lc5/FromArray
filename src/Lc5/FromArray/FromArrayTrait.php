@@ -55,7 +55,7 @@ trait FromArrayTrait
         $refClass = new ReflectionClass(self::class);
 
         foreach ($refClass->getProperties() as $refProperty) {
-            if (preg_match('/@var\s+([^\s]+)/', $refProperty->getDocComment(), $matches)) {
+            if (preg_match('#@var\s+([^\s]+)#', $refProperty->getDocComment(), $matches)) {
                 $types = array_map([self::class, 'mapType'], explode('|', $matches[1]));
                 $propertyName = $refProperty->name;
 
@@ -65,7 +65,6 @@ trait FromArrayTrait
                     foreach ($types as $type) {
                         if (substr($type, -2) === '[]' && is_array($propertyValue)) {
                             $invalidTypes = self::validateTypedArray($propertyValue, substr($type, 0, -2));
-
                             if (!empty($invalidTypes)) {
                                 $invalidProperties[] = [
                                     'name' => $propertyName,
@@ -138,6 +137,9 @@ trait FromArrayTrait
             $value instanceof $type;
     }
 
+    /**
+     * @return string[]
+     */
     private static function validateTypedArray(array $typedArray, string $type): array
     {
         $invalidTypes = [];
