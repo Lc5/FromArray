@@ -38,11 +38,11 @@ trait FromArrayTrait
         if (!empty($missingProperties) || !empty($redundantProperties)) {
             $errorMessage = 'Errors encountered when constructing ' . self::class . PHP_EOL;
 
-            $errorMessage .= !empty($missingProperties) ?
-                'Missing properties: ' . rtrim(implode(', ', $missingProperties), ',') . PHP_EOL : '';
+            $errorMessage .= empty($missingProperties) ?
+                '' : 'Missing properties: ' . rtrim(implode(', ', $missingProperties), ',') . PHP_EOL;
 
-            $errorMessage .= !empty($redundantProperties) ?
-                'Redundant properties: ' . rtrim(implode(', ', $redundantProperties), ',') : '';
+            $errorMessage .= empty($redundantProperties) ?
+                '' : 'Redundant properties: ' . rtrim(implode(', ', $redundantProperties), ',');
 
             throw new InvalidArgumentException($errorMessage);
         }
@@ -52,11 +52,13 @@ trait FromArrayTrait
     {
         $invalidProperties = [];
 
-        $refClass = new ReflectionClass(self::class);
+        $reflectionClass = new ReflectionClass(self::class);
 
-        foreach ($refClass->getProperties() as $refProperty) {
+        foreach ($reflectionClass->getProperties() as $refProperty) {
             if (preg_match('#@var\s+([^\s]+)#', $refProperty->getDocComment(), $matches)) {
-                $types = array_map([self::class, 'mapType'], explode('|', $matches[1]));
+                $types = array_map(function (string $type) : string {
+                    return self::mapType($type);
+                }, explode('|', $matches[1]));
                 $propertyName = $refProperty->name;
 
                 if (array_key_exists($propertyName, $properties)) {
@@ -91,9 +93,9 @@ trait FromArrayTrait
             $errorMessage = 'Errors encountered when constructing ' . self::class . PHP_EOL .
                             'Invalid properties: ' . PHP_EOL;
 
-            foreach ($invalidProperties as $property) {
-                $errorMessage .= ' - ' . $property['name'] . ' must be of the type ' . $property['expectedType'] . ', '
-                    . $property['givenType'] . ' given' . PHP_EOL;
+            foreach ($invalidProperties as $invalidProperty) {
+                $errorMessage .= ' - ' . $invalidProperty['name'] . ' must be of the type ' .
+                    $invalidProperty['expectedType'] . ', ' . $invalidProperty['givenType'] . ' given' . PHP_EOL;
             }
 
             throw new InvalidArgumentException($errorMessage);
@@ -104,15 +106,15 @@ trait FromArrayTrait
     {
         $classProperties = array_keys(get_class_vars(self::class));
 
-        $instance = new self();
+        $self = new self();
 
-        foreach ($classProperties as $propertyName) {
-            if (array_key_exists($propertyName, $properties)) {
-                $instance->$propertyName = $properties[$propertyName];
+        foreach ($classProperties as $classProperty) {
+            if (array_key_exists($classProperty, $properties)) {
+                $self->{$classProperty} = $properties[$classProperty];
             }
         }
 
-        return $instance;
+        return $self;
     }
 
     private static function mapType(string $type): string
