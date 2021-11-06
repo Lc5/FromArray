@@ -56,7 +56,7 @@ trait FromArrayTrait
 
         foreach ($reflectionClass->getProperties() as $refProperty) {
             if (preg_match('#@var\s+([^\s]+)#', $refProperty->getDocComment(), $matches)) {
-                $types = array_map(function (string $type) : string {
+                $types = array_map(function (string $type): string {
                     return self::mapType($type);
                 }, explode('|', $matches[1]));
                 $propertyName = $refProperty->name;
