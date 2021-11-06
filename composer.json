@@ -11,16 +11,19 @@
         }
     ],
     "require": {
-        "php": ">=7.2"
+        "php": ">=7.4"
     },
     "require-dev": {
-        "phpunit/phpunit": "^8.4",
         "phpstan/phpstan": "^1.1",
+        "phpunit/phpunit": "^9.5",
         "symplify/easy-coding-standard": "^9.4"
     },
     "autoload": {
         "psr-4": {
             "Lc5\\FromArray\\": "src/Lc5/FromArray"
         }
+    },
+    "config": {
+        "sort-packages": true
     }
 }
