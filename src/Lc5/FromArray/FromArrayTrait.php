@@ -133,8 +133,8 @@ trait FromArrayTrait
     private static function validateType(string $type, $value): bool
     {
         return
-            $type === 'callable' && is_callable($value) ||
-            $type === 'iterable' && is_iterable($value) ||
+            ($type === 'callable' && is_callable($value)) ||
+            ($type === 'iterable' && is_iterable($value)) ||
             gettype($value) === $type ||
             $value instanceof $type;
     }
