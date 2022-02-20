@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 /*
- * This file is part of the lc5/typed-collection package.
+ * This file is part of the lc5/from-array package.
  *
  * (c) Łukasz Krzyszczak <lukasz.krzyszczak@gmail.com>
  *
