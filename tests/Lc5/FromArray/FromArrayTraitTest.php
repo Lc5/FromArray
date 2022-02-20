@@ -139,6 +139,7 @@ final class TestClass
 
     private string $string;
 
+    /** @var mixed[] */
     private array $array;
 
     /** @var stdClass[] */
@@ -149,6 +150,7 @@ final class TestClass
     /** @var callable */
     private $callable;
 
+    /** @var iterable<mixed> */
     private iterable $iterable;
 }
 

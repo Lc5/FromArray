@@ -9,6 +9,9 @@ use ReflectionClass;
 
 trait FromArrayTrait
 {
+    /**
+     * @param mixed[] $properties
+     */
     public static function fromArray(array $properties, int $options = Options::DEFAULT): self
     {
         self::validate($properties, $options);
@@ -16,6 +19,9 @@ trait FromArrayTrait
         return self::createInstance($properties);
     }
 
+    /**
+     * @param mixed[] $properties
+     */
     protected static function validate(array $properties, int $options): void
     {
         self::validateExistence($properties, $options);
@@ -25,6 +31,9 @@ trait FromArrayTrait
         }
     }
 
+    /**
+     * @param mixed[] $properties
+     */
     protected static function validateExistence(array $properties, int $options): void
     {
         $classProperties = array_keys(get_class_vars(self::class));
@@ -48,6 +57,9 @@ trait FromArrayTrait
         }
     }
 
+    /**
+     * @param mixed[] $properties
+     */
     protected static function validateTypes(array $properties): void
     {
         $invalidProperties = [];
@@ -75,7 +87,7 @@ trait FromArrayTrait
                                 ];
                             }
                             continue 2;
-                        } elseif (self::validateType($type, $propertyValue)) {
+                        } else if (self::validateType($type, $propertyValue)) {
                             continue 2;
                         }
                     }
@@ -102,6 +114,9 @@ trait FromArrayTrait
         }
     }
 
+    /**
+     * @param mixed[] $properties
+     */
     protected static function createInstance(array $properties): self
     {
         $classProperties = array_keys(get_class_vars(self::class));
@@ -130,6 +145,9 @@ trait FromArrayTrait
         return $typesMap[$type] ?? $type;
     }
 
+    /**
+     * @param mixed $value
+     */
     private static function validateType(string $type, $value): bool
     {
         return
@@ -139,6 +157,7 @@ trait FromArrayTrait
     }
 
     /**
+     * @param mixed[] $typedArray
      * @return string[]
      */
     private static function validateTypedArray(array $typedArray, string $type): array
