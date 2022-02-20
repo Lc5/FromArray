@@ -145,7 +145,6 @@ trait FromArrayTrait
             'bool' => 'boolean',
             'int' => 'integer',
             'float' => 'double',
-            'resource (closed)' => 'resource',
             'null' => 'NULL'
         ];
 
