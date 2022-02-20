@@ -84,7 +84,7 @@ trait FromArrayTrait
                     $propertyValue = $properties[$propertyName];
 
                     foreach ($types as $type) {
-                        if (substr($type, -2) === '[]' && is_array($propertyValue)) {
+                        if (substr($type, -2) === '[]' && is_iterable($propertyValue)) {
                             $invalidTypes = self::validateTypedArray($propertyValue, substr($type, 0, -2));
                             if (!empty($invalidTypes)) {
                                 $invalidProperties[] = [
@@ -110,7 +110,7 @@ trait FromArrayTrait
 
         if (!empty($invalidProperties)) {
             $errorMessage = 'Errors encountered when constructing ' . self::class . PHP_EOL .
-                            'Invalid properties: ' . PHP_EOL;
+                            'Invalid properties:' . PHP_EOL;
 
             foreach ($invalidProperties as $invalidProperty) {
                 $errorMessage .= ' - ' . $invalidProperty['name'] . ' must be of the type ' .
@@ -158,6 +158,7 @@ trait FromArrayTrait
     private static function validateType(string $type, $value): bool
     {
         return
+            $type === 'mixed' ||
             ($type === 'callable' && is_callable($value)) ||
             gettype($value) === $type ||
             $value instanceof $type;
@@ -167,7 +168,7 @@ trait FromArrayTrait
      * @param mixed[] $typedArray
      * @return string[]
      */
-    private static function validateTypedArray(array $typedArray, string $type): array
+    private static function validateTypedArray(iterable $typedArray, string $type): array
     {
         $invalidTypes = [];
 

@@ -30,7 +30,9 @@ final class FromArrayTraitTest extends TestCase
             'object' => new stdClass(),
             'callable' => function (): void {
             },
-            'iterable' => new ArrayObject()
+            'iterable' => new ArrayObject(),
+            'typedIterable' => new ArrayObject([new stdClass(), new stdClass()]),
+            'mixed' => 'mixed'
         ];
 
         $instance = TestClass::fromArray($properties);
@@ -62,6 +64,8 @@ final class FromArrayTraitTest extends TestCase
             'callable' => function (): void {
             },
             'iterable' => new ArrayObject(),
+            'typedIterable' => new ArrayObject([new stdClass(), new stdClass()]),
+            'mixed' => [],
             'redundant_1' => 'redundant',
             'redundant_2' => 'redundant'
         ];
@@ -121,14 +125,18 @@ final class FromArrayTraitTest extends TestCase
     public function testFromArray_GivenInvalidProperties_ShouldThrowException(): void
     {
         $properties = [
+            'callable' => 1,
             'typedArray' => [new stdClass(), 'example', 1],
-            'callable' => 1
+            'typedIterable' => new ArrayObject([new stdClass(), 'example', 1])
         ];
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid properties:');
-        $this->expectExceptionMessage('typedArray must be of the type stdClass[], [string, integer] given');
-        $this->expectExceptionMessage('callable must be of the type callable, integer given');
+        $this->expectExceptionMessage(<<<'MESSAGE'
+Invalid properties:
+ - typedArray must be of the type stdClass[], [string, integer] given
+ - callable must be of the type callable, integer given
+ - typedIterable must be of the type stdClass[], [string, integer] given
+MESSAGE);
 
         TestClass::fromArray($properties, Options::VALIDATE_TYPES);
     }
@@ -157,8 +165,14 @@ final class TestClass
     /** @var callable */
     private $callable;
 
-    /** @var iterable<mixed> */
+    /** @var mixed[] */
     private iterable $iterable;
+
+    /** @var stdClass[] */
+    private iterable $typedIterable;
+
+    /** @var mixed */
+    private $mixed;
 }
 
 final class TestClass2
