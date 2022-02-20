@@ -1,4 +1,12 @@
-# FromArray [![Build Status](https://travis-ci.org/Lc5/FromArray.svg?branch=master)](https://travis-ci.org/Lc5/FromArray)
+# FromArray
+
+[![Build Status](https://github.com/Lc5/FromArray/workflows/Build/badge.svg)](https://github.com/Lc5/FromArray/actions)
+[![Latest Stable Version](http://poser.pugx.org/lc5/from-array/v)](https://packagist.org/packages/lc5/from-array)
+[![Total Downloads](http://poser.pugx.org/lc5/from-array/downloads)](https://packagist.org/packages/lc5/from-array)
+[![PHP Version Require](http://poser.pugx.org/lc5/from-array/require/php)](https://packagist.org/packages/lc5/from-array)
+[![License](http://poser.pugx.org/lc5/from-array/license)](https://packagist.org/packages/lc5/from-array)
+[![PHPStan Enabled](https://img.shields.io/badge/PHPStan-enabled-brightgreen.svg?style=flat)](https://phpstan.org/)
+
 Create objects from arrays with type checks
 
 ## Installation
