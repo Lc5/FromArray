@@ -85,7 +85,7 @@ trait FromArrayTrait
 
                     foreach ($types as $type) {
                         if (substr($type, -2) === '[]' && is_iterable($propertyValue)) {
-                            $invalidTypes = self::validateTypedArray($propertyValue, substr($type, 0, -2));
+                            $invalidTypes = self::validateTypedIterable($propertyValue, substr($type, 0, -2));
                             if (!empty($invalidTypes)) {
                                 $invalidProperties[] = [
                                     'name' => $propertyName,
@@ -168,7 +168,7 @@ trait FromArrayTrait
      * @param mixed[] $typedArray
      * @return string[]
      */
-    private static function validateTypedArray(iterable $typedArray, string $type): array
+    private static function validateTypedIterable(iterable $typedArray, string $type): array
     {
         $invalidTypes = [];
 
