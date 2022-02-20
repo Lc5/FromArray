@@ -94,7 +94,7 @@ trait FromArrayTrait
                                 ];
                             }
                             continue 2;
-                        } else if (self::validateType($type, $propertyValue)) {
+                        } elseif (self::validateType($type, $propertyValue)) {
                             continue 2;
                         }
                     }
