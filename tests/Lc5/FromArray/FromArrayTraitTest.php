@@ -37,17 +37,21 @@ final class FromArrayTraitTest extends TestCase
         $this->assertSame($properties['mixed'], $instance->mixed);
     }
 
-    public function testFromArray_GivenCorrectPropertiesForMultiTypeProperty_ShouldCreateObject(): void
+    public function testFromArray_GivenCorrectPropertiesForUnionTypeProperty_ShouldCreateObject(): void
     {
         $instance1 = TestClass2::fromArray([
+            'intOrFloat' => 2,
             'typedArrayOrNull' => []
         ]);
 
         $instance2 = TestClass2::fromArray([
+            'intOrFloat' => 2.5,
             'typedArrayOrNull' => null
         ]);
 
+        $this->assertSame(2, $instance1->intOrFloat);
         $this->assertSame([], $instance1->typedArrayOrNull);
+        $this->assertSame(2.5, $instance2->intOrFloat);
         $this->assertNull($instance2->typedArrayOrNull);
     }
 
@@ -177,6 +181,9 @@ final class TestClass
 final class TestClass2
 {
     use FromArrayTrait;
+
+    /** @var int|float */
+    public $intOrFloat;
 
     /** @var stdClass[]|null */
     public ?array $typedArrayOrNull;
