@@ -24,7 +24,7 @@ The validation consists of the following steps:
 - check if all the required properties are present
 - check if there are no redundant properties
 - check if all the properties have correct types according to the doc blocks. See 
-[Supported Annotations](#Supported Annotations)
+[Supported Annotations](#supported-annotations)
 
 Aforementioned behaviour can be configured. See [Options](#options)
 
@@ -80,10 +80,10 @@ $exampleObject = ExampleClass::fromArray($properties);
 
 The following options are available:
 
-- **DEFAULT** - check for missing and redundant properties and check types
-- **VALIDATE_MISSING** - check for missing properties
-- **VALIDATE_REDUNDANT** - check for redundant properties
-- **VALIDATE_TYPES** - check types of properties
+- ```DEFAULT``` - check for missing and redundant properties and check types
+- ```VALIDATE_MISSING``` - check for missing properties
+- ```VALIDATE_REDUNDANT``` - check for redundant properties
+- ```VALIDATE_TYPES``` - check types of properties
 
 Options can be combined using bitwise operators. To disable validation of redundant properties in order to be able to
 pass an array with more properties you can use the following code:
@@ -99,6 +99,6 @@ More info: https://www.php.net/manual/en/language.operators.bitwise.php
 The following doc block annotations are supported:
 
 * ```callable``` - standard PHP callable type
-* ```mixed``` - representing PHP mixed typed, which basically means any type
-* ```T[]``` - representing typed iterable of items of a given type e.g. ```int[]```, ```stdClass[]``` etc.
+* ```mixed``` - represents PHP mixed typed, which basically means any type
+* ```T[]``` - represents typed iterable of items of a given type e.g. ```int[]```, ```stdClass[]``` etc.
 * union types - e.g. ```int|float``` - representing union of types
