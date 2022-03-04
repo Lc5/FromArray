@@ -1,6 +1,14 @@
 <?php
-declare(strict_types=1);
 
+declare(strict_types=1);
+/*
+ * This file is part of the lc5/from-array package.
+ *
+ * (c) Łukasz Krzyszczak <lukasz.krzyszczak@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 namespace Lc5\FromArray;
 
 use ArrayObject;
@@ -8,52 +16,49 @@ use Lc5\FromArray\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
-class FromArrayTraitTest extends TestCase
+final class FromArrayTraitTest extends TestCase
 {
-    public function testFromArray_GivenCorrectProperties_ShouldCreateObject()
+    public function testFromArray_GivenCorrectProperties_ShouldCreateObject(): void
     {
-        $properties = [
-            'bool'       => true,
-            'int'        => 2,
-            'float'      => 3.5,
-            'string'     => 'example string',
-            'array'      => ['example array'],
-            'typedArray' => [new stdClass(), new stdClass()],
-            'object'     => new stdClass(),
-            'callable'   => function () {},
-            'iterable'   => new ArrayObject()
-        ];
+        $properties = $this->getProperties();
 
         $instance = TestClass::fromArray($properties);
 
-        $this->assertInstanceOf(TestClass::class, $instance);
+        $this->assertSame($properties['bool'], $instance->bool);
+        $this->assertSame($properties['int'], $instance->int);
+        $this->assertSame($properties['float'], $instance->float);
+        $this->assertSame($properties['string'], $instance->string);
+        $this->assertSame($properties['array'], $instance->array);
+        $this->assertSame($properties['object'], $instance->object);
+        $this->assertSame($properties['callable'], $instance->callable);
+        $this->assertSame($properties['iterable'], $instance->iterable);
+        $this->assertSame($properties['typedArray'], $instance->typedArray);
+        $this->assertSame($properties['typedIterable'], $instance->typedIterable);
+        $this->assertSame($properties['mixed'], $instance->mixed);
     }
 
-    public function testFromArray_GivenCorrectPropertiesForMultiTypeProperty_ShouldCreateObject()
+    public function testFromArray_GivenCorrectPropertiesForUnionTypeProperty_ShouldCreateObject(): void
     {
-        $this->assertInstanceOf(TestClass2::class, TestClass2::fromArray([
-            'stringOrNull'     => 'string',
+        $instance1 = TestClass2::fromArray([
+            'intOrFloat' => 2,
             'typedArrayOrNull' => []
-        ]));
+        ]);
 
-        $this->assertInstanceOf(TestClass2::class, TestClass2::fromArray([
-            'stringOrNull'     => null,
+        $instance2 = TestClass2::fromArray([
+            'intOrFloat' => 2.5,
             'typedArrayOrNull' => null
-        ]));
+        ]);
+
+        $this->assertSame(2, $instance1->intOrFloat);
+        $this->assertSame([], $instance1->typedArrayOrNull);
+        $this->assertSame(2.5, $instance2->intOrFloat);
+        $this->assertNull($instance2->typedArrayOrNull);
     }
 
-    public function testFromArray_GivenCorrectPropertiesWithoutRedundantCheck_ShouldCreateObject()
+    public function testFromArray_GivenCorrectPropertiesWithoutRedundantCheck_ShouldCreateObject(): void
     {
-        $properties = [
-            'bool'       => true,
-            'int'        => 2,
-            'float'      => 3.5,
-            'string'     => 'example string',
-            'array'      => ['example array'],
-            'typedArray' => [new stdClass(), new stdClass()],
-            'object'     => new stdClass(),
-            'callable'   => function () {},
-            'iterable'   => new ArrayObject(),
+        $properties = $this->getProperties();
+        $properties += [
             'redundant_1' => 'redundant',
             'redundant_2' => 'redundant'
         ];
@@ -63,7 +68,7 @@ class FromArrayTraitTest extends TestCase
         $this->assertInstanceOf(TestClass::class, $instance);
     }
 
-    public function testFromArray_GivenCorrectPropertiesWithoutMissingCheck_ShouldCreateObject()
+    public function testFromArray_GivenCorrectPropertiesWithoutMissingCheck_ShouldCreateObject(): void
     {
         $properties = [];
 
@@ -72,52 +77,23 @@ class FromArrayTraitTest extends TestCase
         $this->assertInstanceOf(TestClass2::class, $instance);
     }
 
-    public function testFromArray_GivenInvalidTypesWithoutTypeCheck_ShouldCreateObject()
+    public function testFromArray_GivenMissingProperties_ShouldThrowException(): void
     {
-        $properties = [
-            'bool'           => 1,
-            'int'            => '2',
-            'float'          => '3.5',
-            'string'         => 'example string',
-            'array'          => ['example array'],
-            'typedArray'     => [new stdClass(), 'example', 1],
-            'object'         => [],
-            'callable'       => function () {},
-            'iterable'       => new ArrayObject()
-        ];
-
-        $instance = TestClass::fromArray($properties, Options::DEFAULT & ~Options::VALIDATE_TYPES);
-
-        $this->assertInstanceOf(TestClass::class, $instance);
-    }
-
-    public function testFromArray_GivenMissingProperties_ShouldThrowException()
-    {
-        $properties = [
-            'bool'   => true,
-            'int'    => 2,
-            'float'  => 3.5,
-            'string' => 'example string',
-        ];
+        $properties = [];
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Missing properties: array, typedArray, object, callable, iterable');
+        $this->expectExceptionMessage(
+            'Missing properties: bool, int, float, string, array, object, callable, iterable, typedArray, ' .
+            'typedIterable, mixed'
+        );
 
         TestClass::fromArray($properties);
     }
 
-    public function testFromArray_GivenRedundantProperties_ShouldThrowException()
+    public function testFromArray_GivenRedundantProperties_ShouldThrowException(): void
     {
-        $properties = [
-            'bool'        => true,
-            'int'         => 2,
-            'float'       => 3.5,
-            'string'      => 'example string',
-            'array'       => ['example array'],
-            'typedArray'  => [new stdClass(), new stdClass()],
-            'object'      => new stdClass(),
-            'callable'    => function () {},
-            'iterable'    => new ArrayObject(),
+        $properties = $this->getProperties();
+        $properties += [
             'redundant_1' => 'redundant',
             'redundant_2' => 'redundant'
         ];
@@ -128,71 +104,87 @@ class FromArrayTraitTest extends TestCase
         TestClass::fromArray($properties);
     }
 
-    public function testFromArray_GivenInvalidProperties_ShouldThrowException()
+    public function testFromArray_GivenInvalidProperties_ShouldThrowException(): void
     {
         $properties = [
-            'bool'           => 1,
-            'int'            => '2',
-            'float'          => '3.5',
-            'string'         => 'example string',
-            'array'          => ['example array'],
-            'typedArray'     => [new stdClass(), 'example', 1],
-            'object'         => [],
-            'callable'       => function () {},
-            'iterable'       => new ArrayObject(),
+            'callable' => 1,
+            'typedArray' => [new stdClass(), 'example', 1],
+            'typedIterable' => new ArrayObject([new stdClass(), 'example', 1])
         ];
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid properties:');
-        $this->expectExceptionMessage('bool must be of the type bool, integer given');
-        $this->expectExceptionMessage('int must be of the type int, string given');
-        $this->expectExceptionMessage('float must be of the type float, string given');
-        $this->expectExceptionMessage('object must be of the type object, array given');
-        $this->expectExceptionMessage('typedArray must be of the type stdClass[], [string, integer] given');
+        $this->expectExceptionMessage(<<<'MESSAGE'
+Invalid properties:
+ - callable must be of the type callable, integer given
+ - typedArray must be of the type stdClass[], [string, integer] given
+ - typedIterable must be of the type stdClass[], [string, integer] given
+MESSAGE);
 
-        TestClass::fromArray($properties);
+        TestClass::fromArray($properties, Options::VALIDATE_TYPES);
+    }
+
+    /**
+     * @return mixed[]
+     */
+    private function getProperties(): array
+    {
+        return [
+            'bool' => true,
+            'int' => 2,
+            'float' => 3.5,
+            'string' => 'example string',
+            'array' => ['example array'],
+            'object' => new stdClass(),
+            'callable' => function (): void {
+            },
+            'iterable' => new ArrayObject(),
+            'typedArray' => [new stdClass(), new stdClass()],
+            'typedIterable' => new ArrayObject([new stdClass(), new stdClass()]),
+            'mixed' => 'mixed'
+        ];
     }
 }
 
-class TestClass
+final class TestClass
 {
     use FromArrayTrait;
 
-    /** @var bool */
-    private $bool;
+    public bool $bool;
 
-    /** @var int */
-    private $int;
+    public int $int;
 
-    /** @var float */
-    private $float;
+    public float $float;
 
-    /** @var string */
-    private $string;
+    public string $string;
 
-    /** @var array */
-    private $array;
+    /** @var mixed[] */
+    public array $array;
 
-    /** @var stdClass[] */
-    private $typedArray;
-
-    /** @var object */
-    private $object;
+    public object $object;
 
     /** @var callable */
-    private $callable;
+    public $callable;
 
-    /** @var iterable */
-    private $iterable;
+    /** @var mixed[] */
+    public iterable $iterable;
+
+    /** @var stdClass[] */
+    public array $typedArray;
+
+    /** @var stdClass[] */
+    public iterable $typedIterable;
+
+    /** @var mixed */
+    public $mixed;
 }
 
-class TestClass2
+final class TestClass2
 {
     use FromArrayTrait;
 
-    /** @var string|null */
-    private $stringOrNull;
+    /** @var int|float */
+    public $intOrFloat;
 
     /** @var stdClass[]|null */
-    private $typedArrayOrNull;
+    public ?array $typedArrayOrNull;
 }
