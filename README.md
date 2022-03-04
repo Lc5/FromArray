@@ -28,6 +28,7 @@ The validation consists of the following steps:
 
 Aforementioned behaviour can be configured. See [Options](#options)
 
+### Basic example
 ```php
 use Lc5\FromArray\FromArrayTrait;
 
@@ -39,9 +40,30 @@ class ExampleClass
     private int $int;
     private float $float;
     private string $string;
-    /** @var mixed[] */
     private array $array;
     private object $object;
+}
+
+$properties = [
+    'bool' => true,
+    'int' => 2,
+    'float' => 3.5,
+    'string' => 'example string',
+    'array' => ['example array'],
+    'object' => new stdClass()
+];
+
+$exampleObject = ExampleClass::fromArray($properties);
+```
+
+### Advanced example
+```php
+use Lc5\FromArray\FromArrayTrait;
+
+class ExampleClass
+{
+    use FromArrayTrait;
+    
     /** @var callable */
     private $callable;
     /** @var mixed[] */
@@ -57,12 +79,6 @@ class ExampleClass
 }
 
 $properties = [
-    'bool' => true,
-    'int' => 2,
-    'float' => 3.5,
-    'string' => 'example string',
-    'array' => ['example array'],
-    'object' => new stdClass(),
     'callable' => function (): void {},
     'iterable' => new ArrayObject(),
     'typedArray' => [new stdClass(), new stdClass()],
@@ -102,3 +118,6 @@ The following doc block annotations are supported:
 * ```mixed``` - represents PHP mixed typed, which basically means any type
 * ```T[]``` - represents typed iterable of items of a given type e.g. ```int[]```, ```stdClass[]``` etc.
 * union types - e.g. ```int|float``` - representing union of types
+
+Standard PHP types are supported by native 
+[Typed Properties](https://www.php.net/manual/en/language.oop5.properties.php)
